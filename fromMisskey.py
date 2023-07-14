@@ -49,7 +49,7 @@ async def discord(data):
         main_content = {
             "username": name_of_user,
             "avatar_url": avatar_of_user,
-            "content": f"https://mk.shrimpia.network/notes/{data['body']['body']['id']}"}
+            "content": f"https://misskey.io/notes/{data['body']['body']['id']}"}
 
         #headerを設定してTLに送信
         headers = {'Content-Type': 'application/json'}
