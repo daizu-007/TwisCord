@@ -7,7 +7,7 @@ import requests
 #サーバーのURLの設定
 misskey_url = "wss://mk.shrimpia.network/streaming"
 #discord web hookのURLを設定
-discord_url = "ここにwebhookURLを入力"
+discord_url = "https://discordapp.com/api/webhooks/1127614453274386504/XknVVjktWE9NgT6WBcf5IcjvDAYrVAX8_ud8_w9rQKrQYh4vXxVRsEqJcjuSrM67tmnE"
 
 #misskey側での処理
 async def misskey():
