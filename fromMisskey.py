@@ -3,11 +3,12 @@ import asyncio
 import json
 import websockets
 import requests
+import os
 
 #サーバーのURLの設定
-misskey_url = "wss://mk.shrimpia.network/streaming"
+misskey_url = "wss://misskey.io/streaming"
 #discord web hookのURLを設定
-discord_url = "https://discordapp.com/api/webhooks/1127614453274386504/XknVVjktWE9NgT6WBcf5IcjvDAYrVAX8_ud8_w9rQKrQYh4vXxVRsEqJcjuSrM67tmnE"
+discord_url = os.environ["DcURL"]
 
 #misskey側での処理
 async def misskey():
