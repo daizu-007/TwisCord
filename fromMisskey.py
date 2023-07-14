@@ -7,7 +7,7 @@ import requests
 #サーバーのURLの設定
 misskey_url = "wss://mk.shrimpia.network/streaming"
 #discord web hookのURLを設定
-discord_url = "https://discordapp.com/api/webhooks/1125035459295322112/Ir-hHEFcy78rgs9xhk5OfPmFSIFZwOyHTDJ4olsXv09FOo9hGNM5SfbEfzfJuDfrQA3J"
+discord_url = "https://discordapp.com/api/webhooks/1127614453274386504/XknVVjktWE9NgT6WBcf5IcjvDAYrVAX8_ud8_w9rQKrQYh4vXxVRsEqJcjuSrM67tmnE"
 
 #misskey側での処理
 async def misskey():
@@ -28,17 +28,18 @@ async def misskey():
                 #print(data)
                 if data["type"] == "channel":
                     if data["body"]["type"] == "note":
-                        note = data['body']['body']
-                        await discord(note)
+                        #data = json.dumps(data)
+                        await discord(data)
 
     #エラーが起きたら内容を表示する
     except Exception as e:
-        print("errer at misskey function. errer is "+ e)
+        print("error at misskey function. error is "+ e)
 
 #discord側での処理
-async def discord(note):
+async def discord(data):
     try:
         #データを取得
+        note = data['body']['body']#ノート
         user = note["user"]#ユーザー
         name_of_user = user["name"]#ユーザー名
         avatar_of_user = user["avatarUrl"]#プロフィール画像のURL
@@ -47,7 +48,7 @@ async def discord(note):
         main_content = {
             "username": name_of_user,
             "avatar_url": avatar_of_user,
-            "content": content}
+            "content": f"https://mk.shrimpia.network/notes/{data['body']['body']['id']}"}
 
         #headerを設定してTLに送信
         headers = {'Content-Type': 'application/json'}
@@ -55,7 +56,7 @@ async def discord(note):
     
     #エラーが起きたら内容を表示する
     except Exception as e:
-        print("errer at discord function. errer is "+ e)
+        print("error at discord function. error is "+ e)
 
 #実行
 asyncio.run(misskey())
