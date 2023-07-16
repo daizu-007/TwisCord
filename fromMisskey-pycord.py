@@ -8,7 +8,7 @@ import discord
 import os
 
 #初期設定
-#デバックように区切りを定義
+#デバック用に区切りを定義
 line = "========================================================================================================================================================================"
 #botの権限 .allで全ての権限を与える。
 intents = discord.Intents.default()
@@ -92,7 +92,7 @@ async def PostToDiscord(data):
 @bot.event
 async def on_ready():
     global timeline #timelineというグローバル関数を定義
-    timeline = discord.utils.get(bot.get_all_channels(), name='👥timeline')#tiemlineチャンネル
+    timeline = discord.utils.get(bot.get_all_channels(), name='👥timeline')#timelineチャンネル
     await GetFromMisskey()#GetFromMisskey関数を呼び出す
 
 #実行
