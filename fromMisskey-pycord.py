@@ -51,6 +51,9 @@ async def GetFromMisskey():
 async def PostToDiscord(data):
     try:
         if data["body"]["type"] == "note":#もし新規ノートなら
+
+            #print("on PostToDiscord function") #デバック用
+
             #データを取得
             note = data['body']['body']#ノートのデータ
             user = note["user"]#ユーザー
@@ -61,7 +64,15 @@ async def PostToDiscord(data):
             user_url = f"https://misskey.io/@{user['username']}"#ユーザープロフィールのURL
             attachment_file = note['files']#添付ファイル
 
-            #ユーザー名が取得できないユーザーへの特例処置
+            #デバック用、添付ファイルが含まれなければ処理をやめる
+            """
+            if attachment_file == []:
+                return
+            else:
+                print("Get posts with files")
+            """
+
+            #ユーザー名が取得できないユーザーへの特例処置 (要改善)
             if name_of_user == None:
                 name_of_user = "名無しのMisskey.io民"
             
@@ -73,15 +84,37 @@ async def PostToDiscord(data):
                              url=note_url)#ノートのURL
             embed.set_thumbnail(url=avatar_of_user)#ユーザーのアイコン
 
-            if not attachment_file == []:
-                #print(note['files'])
-                embed.set_image(url=attachment_file[0]['url'])#添付ファイルの一番目のURLを取得し画像として表示（要修正）
+            embeds = [embed]#複数画像に対応するために埋め込みをリスト化
+            
+            #すべての画像を埋め込む処理
+            for number, file in enumerate(attachment_file):#添付ファイルリスト内のファイルを順に処理
+                #numberはファイルの番号,fileは処理中のファイル
+                #print(note['files']) #デバック用
 
+                if file['isSensitive']: #NSFWなら
+                    continue #スキップ
+
+                if number == 0:
+                    # 最初のファイルは既存のembedに追加する
+                    embed.set_image(url=file['url'])#画像を埋め込む
+                else:
+                    # 2つ目以降のファイルは新しい埋め込みオブジェクトを作成してリストに追加
+                    embed = discord.Embed(url=user_url)#新しい埋め込みオブジェクトを作成
+                    embed.set_image(url=file['url'])#画像を埋め込む
+                    embeds.append(embed)#リストに埋め込みを追加
+
+                    #print("A post was made with multiple files") #デバック用
+            
             #TLに表示する内容と受信した内容を表示（デバック用）
             #print(f"{line}\n title: {name_of_user}\n url: {note_url}\n text: {note_text}\n{line}\n"+json.dumps(note, indent=4))
             
+            #print("I'll send") #デバック用
+
+            #埋め込み一覧を表示（デバック用）
+            #print(embeds)
+
             #TLに送信
-            await timeline.send(embed=embed)
+            await timeline.send(embeds=embeds)
     
     #エラーが起きたら内容を表示する
     except Exception as e:
