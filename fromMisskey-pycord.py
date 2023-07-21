@@ -113,9 +113,12 @@ async def PostToDiscord(data):
             #埋め込み一覧を表示（デバック用）
             #print(embeds)
 
-            #TLに送信
-            await timeline.send(embeds=embeds)
-    
+            try:
+                #TLに送信
+                await timeline.send(embeds=embeds)#embed"s"とすることでlist型を受け取らせられる
+            except Exception as e:
+                print("error at posting to discord. error is "+ str(e))#discordへの返信に失敗したらエラー内容を表示
+
     #エラーが起きたら内容を表示する
     except Exception as e:
         print("error at PostToDiscord function. error is "+ str(e))
