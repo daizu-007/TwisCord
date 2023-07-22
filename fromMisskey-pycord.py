@@ -16,12 +16,15 @@ intents = discord.Intents.default()
 bot = discord.Client(intents=intents)
 #discordのトークン
 dcToken = os.environ["dctoken"]
+#Misskeyサーバーの種類 misskey.io: "misskey.io", shrimpia: "mk.shrimpia.network"
+mk_server = "mk.shrimpia.network"
 #misskeyサーバーのURLの設定
-misskey_url = "wss://misskey.io/streaming" #misskey.ioのアドレス
+misskey_url = f"wss://{mk_server}/streaming" #misskeyサーバーのアドレス
 #discord web hookのURLを設定
 #discord_url = os.environ["DcURL"] #webhookを使用しない場合不要
 #URL集
-urls = {"misskeyio_icon":"https://s3.arkjp.net/misskey/webpublic-0c66b1ca-b8c0-4eaa-9827-47674f4a1580.png"}
+urls = {"misskey.io_icon":"https://s3.arkjp.net/misskey/webpublic-0c66b1ca-b8c0-4eaa-9827-47674f4a1580.png",
+        "mk.shrimpia.network_icon":"https://media.shrimpia.network/mk-shrimpia/files/a3d2afcb-0157-40b1-9675-f4f1bb2f0d6c.png"}
 
 #misskey側での処理
 async def GetFromMisskey():
@@ -61,8 +64,8 @@ async def PostToDiscord(data):
             name_of_user = user["name"]#ユーザー名
             avatar_of_user = user["avatarUrl"]#プロフィール画像のURL
             note_text = note["text"]#ノートのテキスト
-            note_url = f"https://misskey.io/notes/{data['body']['body']['id']}"#ノートのURL
-            user_url = f"https://misskey.io/@{user['username']}"#ユーザープロフィールのURL
+            note_url = f"https://{mk_server}/notes/{data['body']['body']['id']}"#ノートのURL
+            user_url = f"https://{mk_server}/@{user['username']}"#ユーザープロフィールのURL
             attachment_file = note['files']#添付ファイル
 
             #デバック用、添付ファイルが含まれなければ処理をやめる
@@ -75,13 +78,13 @@ async def PostToDiscord(data):
 
             #ユーザー名が取得できないユーザーへの特例処置 (要改善)
             if name_of_user == None:
-                name_of_user = "名無しのMisskey.io民"
+                name_of_user = f"名無しの{mk_server}民"
             
             #TLに表示する内容を作成（埋め込み）
             embed = discord.Embed(title=name_of_user, url=user_url, #ユーザープロフィールのリンク付きユーザー名
                                   description=note_text)#ノートの本文
-            embed.set_author(name="Misskey.io", #送信元
-                             icon_url=urls["misskeyio_icon"], #アイコンのURL
+            embed.set_author(name=mk_server, #送信元
+                             icon_url=urls[f"{mk_server}_icon"], #アイコンのURL
                              url=note_url)#ノートのURL
             embed.set_thumbnail(url=avatar_of_user)#ユーザーのアイコン
 
