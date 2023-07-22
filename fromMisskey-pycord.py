@@ -49,7 +49,7 @@ async def GetFromMisskey():
     #エラーが起きたら内容を表示する
     except Exception as e:
         print("error at GetFromMisskey function. error is "+ str(e))
-    await GetFromMisskey #GetFromMisskey関数を呼び出す。いつかエラー内容を考慮するように変更したい。
+    await GetFromMisskey() #GetFromMisskey関数を呼び出す。いつかエラー内容を考慮するように変更したい。
 
 #discord側での処理
 async def PostToDiscord(data):
