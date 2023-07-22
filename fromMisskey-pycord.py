@@ -19,7 +19,7 @@ dcToken = os.environ["dctoken"]
 #misskeyサーバーのURLの設定
 misskey_url = "wss://misskey.io/streaming" #misskey.ioのアドレス
 #discord web hookのURLを設定
-discord_url = os.environ["DcURL"]
+#discord_url = os.environ["DcURL"] #webhookを使用しない場合不要
 #URL集
 urls = {"misskeyio_icon":"https://s3.arkjp.net/misskey/webpublic-0c66b1ca-b8c0-4eaa-9827-47674f4a1580.png"}
 
@@ -46,6 +46,7 @@ async def GetFromMisskey():
     #エラーが起きたら内容を表示する
     except Exception as e:
         print("error at GetFromMisskey function. error is "+ str(e))
+    await GetFromMisskey #GetFromMisskey関数を呼び出す。いつかエラー内容を考慮するように変更したい。
 
 #discord側での処理
 async def PostToDiscord(data):
