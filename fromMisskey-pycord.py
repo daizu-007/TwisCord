@@ -7,6 +7,10 @@ import requests
 import discord
 import os
 
+#デバック用設定
+isDebug = False #Trueでデバックモード、discordに送信されなくなる
+isManualDebug = False #Trueでマニュアルデバックモード、デバックモードによって設定される機能を無効化
+
 #初期設定
 #デバック用に区切りを定義
 line = "========================================================================================================================================================================"
@@ -17,7 +21,7 @@ bot = discord.Client(intents=intents)
 #discordのトークン
 dcToken = os.environ["dctoken"]
 #Misskeyサーバーの種類 misskey.io: "misskey.io", shrimpia: "mk.shrimpia.network"
-mk_server = "mk.shrimpia.network"
+mk_server = "misskey.io"
 #misskeyサーバーのURLの設定
 misskey_url = f"wss://{mk_server}/streaming" #misskeyサーバーのアドレス
 #discord web hookのURLを設定
@@ -51,11 +55,12 @@ async def GetFromMisskey():
         print("error at GetFromMisskey function. error is "+ str(e))
     await GetFromMisskey() #GetFromMisskey関数を呼び出す。いつかエラー内容を考慮するように変更したい。
 
+
 #discord側での処理
 async def PostToDiscord(data):
     try:
         if data["body"]["type"] == "note":#もし新規ノートなら
-
+            
             #print("on PostToDiscord function") #デバック用
 
             #データを取得
@@ -67,6 +72,15 @@ async def PostToDiscord(data):
             note_url = f"https://{mk_server}/notes/{data['body']['body']['id']}"#ノートのURL
             user_url = f"https://{mk_server}/@{user['username']}"#ユーザープロフィールのURL
             attachment_file = note['files']#添付ファイル
+
+            if not note.get["renote"] == None: #リノート付きなら
+                #このif文の中renote = 以降AI生成に付き要確認
+                renote = note.get["renote"]#ノートのリノート
+                renote_text = renote["text"]#リノートのテキスト
+                renote_url = f"https://{mk_server}/notes/{renote['id']}"#リノートのURL
+                renote_user_url = f"https://{mk_server}/@{renote['user']['username']}"#リノートのユーザープロフィールのURL
+
+                return
 
             #デバック用、添付ファイルが含まれなければ処理をやめる
             """
@@ -117,12 +131,18 @@ async def PostToDiscord(data):
             #埋め込み一覧を表示（デバック用）
             #print(embeds)
 
-            try:
-                #TLに送信
-                await timeline.send(embeds=embeds)#embed"s"とすることでlist型を受け取らせられる
-            except Exception as e:
-                print("error at posting to discord. error is "+ str(e))#discordへの返信に失敗したらエラー内容を表示
+            if isDebug:
+                pass
+            else:
+                try:
+                    #TLに送信
+                    await timeline.send(embeds=embeds)#embed"s"とすることでlist型を受け取らせられる
+                except Exception as e:
+                    print("error at posting to discord. error is "+ str(e))#discordへの返信に失敗したらエラー内容を表示
 
+        else:
+            print(data["body"]["type"])#noteじゃないやつってなんなんだ？といった感情で設定
+            
     #エラーが起きたら内容を表示する
     except Exception as e:
         print("error at PostToDiscord function. error is "+ str(e))
@@ -136,7 +156,14 @@ async def on_ready():
     await GetFromMisskey()#GetFromMisskey関数を呼び出す
 
 #実行
-#asyncio.run(GetFromMisskey()) #テスト用
-#asyncio.run(PostToDiscord()) #テスト用
-bot.run(dcToken) #botを起動
 
+if isDebug:
+    if isManualDebug:
+        #asyncio.run(GetFromMisskey()) #テスト用
+        #asyncio.run(PostToDiscord()) #テスト用
+        #bot.run(dcToken) #テスト用
+        pass
+    else:
+        asyncio.run(GetFromMisskey())
+else:
+    bot.run(dcToken)
