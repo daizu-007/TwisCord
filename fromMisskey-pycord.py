@@ -60,6 +60,7 @@ async def GetFromMisskey():
 async def PostToDiscord(data):
     try:
         if data["body"]["type"] == "note":#もし新規ノートなら
+
             
             #print("on PostToDiscord function") #デバック用
 
@@ -73,15 +74,26 @@ async def PostToDiscord(data):
             user_url = f"https://{mk_server}/@{user['username']}"#ユーザープロフィールのURL
             attachment_file = note['files']#添付ファイル
 
-            if not note.get["renote"] == None: #リノート付きなら
+            #デバック用、リノート付きの投稿の内容を表示して終了
+            """            
+            if note_text == None and attachment_file == []:
+                print(json.dumps(note, indent=4))
+                print(line)
+                await exit()
+            """
+            
+
+            
+            if not note["renoteId"] == None: #リノート付きなら
                 #このif文の中renote = 以降AI生成に付き要確認
-                renote = note.get["renote"]#ノートのリノート
+                renote = note["renote"]#ノートのリノート
                 renote_text = renote["text"]#リノートのテキスト
                 renote_url = f"https://{mk_server}/notes/{renote['id']}"#リノートのURL
                 renote_user_url = f"https://{mk_server}/@{renote['user']['username']}"#リノートのユーザープロフィールのURL
-
+                #print(json.dumps(renote, indent=4))
                 return
-
+            
+            
             #デバック用、添付ファイルが含まれなければ処理をやめる
             """
             if attachment_file == []:
@@ -131,9 +143,9 @@ async def PostToDiscord(data):
             #埋め込み一覧を表示（デバック用）
             #print(embeds)
 
-            if isDebug:
-                pass
-            else:
+            if isDebug: #デバックモードなら
+                pass #何もしない
+            else: #でなければ
                 try:
                     #TLに送信
                     await timeline.send(embeds=embeds)#embed"s"とすることでlist型を受け取らせられる
